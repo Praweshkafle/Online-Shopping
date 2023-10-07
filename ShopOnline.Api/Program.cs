@@ -19,6 +19,7 @@ builder.Services.AddDbContext<AppDbContext>(option =>
 });
 
 builder.Services.AddScoped<ProductRepository, ProductRepositoryImpl>();
+builder.Services.AddScoped<ShoppingCartRepository, ShoppingCartRepositoryImpl>();
 
 
 var app = builder.Build();

@@ -48,7 +48,7 @@ namespace ShopOnline.Api.Repositories.Implementations
             throw new NotImplementedException();
         }
 
-        public async Task<CartItem?> GetItem(int? id)
+        public async Task<CartItem> GetItem(int id)
         {
             return await (from cart in this.appDbContext.Carts
                           join cartItem in this.appDbContext.CartItems

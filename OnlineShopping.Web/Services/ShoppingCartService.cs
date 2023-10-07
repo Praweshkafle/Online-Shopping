@@ -1,56 +1,30 @@
 ﻿using OnlineShopping.Models.Dtos;
 using OnlineShopping.Web.Services.Contracts;
+using System.Net.Http;
 using System.Net.Http.Json;
 
 namespace OnlineShopping.Web.Services
 {
-    public class ProductService : IProductService
+    public class ShoppingCartService : IShoppingCartService
     {
-        private readonly HttpClient _httpClient;
+        private readonly HttpClient httpClient;
 
-        public ProductService(HttpClient httpClient)
+        public ShoppingCartService(HttpClient httpClient)
         {
-            _httpClient = httpClient;
+            this.httpClient = httpClient;
         }
-
-        public async Task<ProductDto> GetItem(int id)
+        public async Task<CartItemDto> AddItem(CartItemToAddDto itemToAddDto)
         {
             try
             {
-                var response = await _httpClient.GetAsync($"api/product/{id}");
+                var response = await httpClient.PostAsJsonAsync<CartItemToAddDto>(("api/cart"), itemToAddDto);
                 if (response.IsSuccessStatusCode)
                 {
                     if (response.StatusCode == System.Net.HttpStatusCode.NoContent)
                     {
-                        return default(ProductDto);
+                        return default(CartItemDto);
                     }
-                    return await response.Content.ReadFromJsonAsync<ProductDto>();
-                }
-                else
-                {
-                    var message= await response.Content.ReadAsStringAsync();
-                    throw new Exception(message);
-                }
-            }
-            catch (Exception)
-            {
-
-                throw;
-            }
-        }
-
-        public async Task<IEnumerable<ProductDto>> GetItems()
-        {
-            try
-            {
-                var response = await _httpClient.GetAsync($"api/product");
-                if (response.IsSuccessStatusCode)
-                {
-                    if (response.StatusCode == System.Net.HttpStatusCode.NoContent)
-                    {
-                        return Enumerable.Empty<ProductDto>();
-                    }
-                    return await response.Content.ReadFromJsonAsync<IEnumerable<ProductDto>>();
+                    return await response.Content.ReadFromJsonAsync<CartItemDto>();
                 }
                 else
                 {
@@ -60,8 +34,35 @@ namespace OnlineShopping.Web.Services
             }
             catch (Exception)
             {
+
                 throw;
             }
         }
+
+        public async Task<IEnumerable<CartItemDto>> GetItems(int userId)
+        {
+            try
+            {
+                var response = await httpClient.GetAsync($"api/GetItems/{userId}");
+                if (response.IsSuccessStatusCode)
+                {
+                    if (response.StatusCode == System.Net.HttpStatusCode.NoContent)
+                    {
+                        return Enumerable.Empty<CartItemDto>();
+                    }
+                    return await response.Content.ReadFromJsonAsync<IEnumerable<CartItemDto>>();
+                }
+                else
+                {
+                    var message = await response.Content.ReadAsStringAsync();
+                    throw new Exception(message);
+                }
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+}
     }
 }
