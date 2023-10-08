@@ -71,7 +71,7 @@ namespace ShopOnline.Api.Extensions
                         CartId = cartItem.CartId,
                         Qty = cartItem.Qty,
                         TotalPrice = product.Price * cartItem.Qty
-                    });
+                    };
 
         }
     }
