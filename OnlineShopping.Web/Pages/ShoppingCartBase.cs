@@ -28,11 +28,12 @@ namespace OnlineShopping.Web.Pages
             try
             {
                 ShoppingCartItems = await ShoppingCartService.GetItems(HardCoded.UserId);
-                CalculateCartSummary();
+
+                CartChanged();
+
             }
             catch (Exception)
             {
-
                 throw;
             }
         }
@@ -42,8 +43,7 @@ namespace OnlineShopping.Web.Pages
             var cartItems = await ShoppingCartService.DeleteItem(id);
 
             RemoveCartItem(id);
-            CalculateCartSummary();
-
+            CartChanged();
         }
 
 
@@ -73,7 +73,7 @@ namespace OnlineShopping.Web.Pages
                     };
                     var returnedUpdatedItemDto = await ShoppingCartService.UpdateQty(updateItemDto);
                     UpdateItemTotalPrice(returnedUpdatedItemDto);
-                    CalculateCartSummary();
+                    CartChanged();
                     StateHasChanged();
                     await MakeUpdateVisible(id, false);
                 }
@@ -127,6 +127,12 @@ namespace OnlineShopping.Web.Pages
         private void setTotalQuantity()
         {
             TotalQuantity = ShoppingCartItems.Sum(a => a.Qty);
+        }
+
+        private void CartChanged()
+        {
+            CalculateCartSummary();
+            ShoppingCartService.RaiseEventOnCartChanged(TotalQuantity);
         }
 
     }

@@ -8,12 +8,28 @@ namespace OnlineShopping.Web.Pages
     {
         [Inject]
         public IProductService productService { get; set; }
+        [Inject]
+        public IShoppingCartService ShoppingCartService { get; set; }
 
         public IEnumerable<ProductDto> Products { get; set; }
 
         protected override async Task OnInitializedAsync()
         {
-            Products = await productService.GetItems();
+            try
+            {
+                Products = await productService.GetItems();
+                var shoppintCartItems = await ShoppingCartService.GetItems(HardCoded.UserId);
+                var totalQty = shoppintCartItems.Sum(a => a.Qty);
+
+                ShoppingCartService.RaiseEventOnCartChanged(totalQty);
+
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+
         }
 
         protected IOrderedEnumerable<IGrouping<int, ProductDto>> GetGroupedProductByCategory()

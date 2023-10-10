@@ -12,10 +12,13 @@ namespace OnlineShopping.Web.Services
     {
         private readonly HttpClient httpClient;
 
+        public event Action<int> OnshoppingCartChanged;
         public ShoppingCartService(HttpClient httpClient)
         {
             this.httpClient = httpClient;
         }
+
+
         public async Task<CartItemDto> AddItem(CartItemToAddDto itemToAddDto)
         {
             try
@@ -86,6 +89,14 @@ namespace OnlineShopping.Web.Services
             }
         }
 
+        public void RaiseEventOnCartChanged(int qty)
+        {
+            if (OnshoppingCartChanged != null)
+            {
+                OnshoppingCartChanged.Invoke(qty);
+            }
+        }
+
         public async Task<CartItemDto> UpdateQty(CartItemQtyUpdateDto cartItemQtyUpdateDto)
         {
             try
@@ -93,7 +104,7 @@ namespace OnlineShopping.Web.Services
                 var jsonResult = JsonConvert.SerializeObject(cartItemQtyUpdateDto);
                 var content = new StringContent(jsonResult, Encoding.UTF8, "application/json-patch+json");
 
-                var response = await httpClient.PatchAsync($"api/cart/{cartItemQtyUpdateDto.CartItemId}",content);
+                var response = await httpClient.PatchAsync($"api/cart/{cartItemQtyUpdateDto.CartItemId}", content);
                 if (response.IsSuccessStatusCode)
                 {
                     return await response.Content.ReadFromJsonAsync<CartItemDto>();
